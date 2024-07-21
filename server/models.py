@@ -4,6 +4,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy_serializer import SerializerMixin
 
 
+
 metadata = MetaData(
     naming_convention={
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -27,7 +28,16 @@ class Customer(db.Model, SerializerMixin):
         "reviews", "item", creator=lambda item_obj: Review(item=item_obj)
     )
 
+    serialize_rules = ("-reviews.customer",)
+
+    reviews = db.relationship("Review", back_populates="customer")
+
+    items = association_proxy(
+        "reviews", "item", creator=lambda item_obj: Review(item=item_obj)
+    )
+
     def __repr__(self):
+        return f"<Customer {self.id}, {self.name}>"
         return f"<Customer {self.id}, {self.name}>"
 
 
